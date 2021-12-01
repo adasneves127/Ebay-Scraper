@@ -76,7 +76,7 @@ Items = page.split("class=s-item__link href=")
 Output = open("Output.csv", "w")
 OutputHTML = open("Output.html", "w")
 Output.write("Item Name,Item Price,Item Link\n")
-OutputHTML.write('<!DOCTYPE html><html lang="en"><head>    <meta charset="UTF-8">    <meta http-equiv="X-UA-Compatible" content="IE=edge">    <meta name="viewport" content="width=device-width, initial-scale=1.0">    <title>Ebay Results: </title></head><body>    <table cellpadding="10", cellspacing="5">        <tr>            <th class="Name">Item Name</th>            <th class="Price">Item Price</th>            <th class="Link">Link</th>        </tr>        ')
+OutputHTML.write('<!DOCTYPE html><html lang="en"><head>    <meta charset="UTF-8">    <meta http-equiv="X-UA-Compatible" content="IE=edge">    <meta name="viewport" content="width=device-width, initial-scale=1.0">  <script src="Sorting.js"></script> <link rel="stylesheet" href="style.css">  <title>Ebay Results: </title></head><body>    <table id="myTable" cellpadding="10", cellspacing="5">        <tr>            <th onclick="sortTable(0)" class="Name">Item Name</th>            <th onclick="sortTable(1)" class="Price">Item Price</th>            <th class="Link">Link</th>        </tr>        ')
 
 
 DisallowedChars = [',', ';', ':', '"', "'", "”"]
@@ -128,7 +128,8 @@ for i in range(len(Items)):
         #Filter out our bad spans...
         
         #print(Items[i])
-OutputHTML.write("<style>button{background-color: #002ccb;color: white !important;border-radius: 10px; border: 1px solid black; box-shadow: 3px 3px black; font-family: Arial, Verdana, sans-serif; width: 100; } table{ width: 600px; } th, td{ padding: 7px 10px 10px 10px; } th{ text-transform: uppercase; letter-spacing: 0.1em; font-size: 90%; border-bottom: 2px solid #111111; border-top: 1px solid #999; text-align: left; } .ItemButton{ width: 8vw; } tr:nth-child(2n + 1){ background-color: #efefef; } tr:hover{ background-color: #ffeeee; }</style></body></html>")
+
+OutputHTML.write("</body></html>")
 Output.close();
 OutputHTML.close();
 OutputOption = input("Would you like to open results in [L]ibreOffice or [B]rowser?")
