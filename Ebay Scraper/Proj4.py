@@ -30,7 +30,7 @@ OutputHTML.write("""
         <meta http-equiv="X-UA-Compatible" content="IE=edge">    
         <meta name="viewport" content="width=device-width, initial-scale=1.0">    
         <title>Ebay Results: </title>
-    </head>       
+       
 """)
 #Write our HTML boiler plate code to our HTML file.
 
@@ -50,21 +50,10 @@ ConditionCodes = [  1000,
                     3000,
                     7000]
 if AdvancedSearch:
-    PriceLow = input("What is the lowest price you would like to filter? $")
-    AdvancedQuery += ("&_udlo=" + PriceLow) if PriceLow != "" else ""
-    PriceHigh = input("What is the highest price you would like to filter? $")
-    AdvancedQuery += ("&_udhi=" + PriceHigh) if PriceHigh != "" else ""
-    Material = True if input("Is there any material you would like to filter? (Y, N) ").lower() == "y" else False
-    if Material:
-        MatType = input("Which Material? ")
-        AdvancedQuery += ("&Material=" + MatType) if MatType != "" else ""
-    if input("Would you like to filter by condition? (Y, N) ").lower() == "y":
-        print("Please enter the associated number for your search: ")
-        for i in range(len(Conditions)):
-            print(f"{i}: {Conditions[i]}")
-        CondCode = int(input("? "))
-        ConditionType = ConditionCodes[CondCode]   
-    if input("Any results to exclude? (Y, N) ").lower() == "y":
+    OutputHTML.write("<ul>")
+    if input("Any results to exclude? (Y, N) ").lower() == "y":  
+        OutputHTML.write("<li>Excluded Results</li>")
+        OutputHTML.write("<ul>")  
         Exclusions = []
         CurrentExclude = ""
         print("Enter your excluding items. When done, type exit();")
@@ -74,9 +63,31 @@ if AdvancedSearch:
                 break;
             else:
                 Exclusions.append(CurrentExclude)
+                
 
         for i in Exclusions:
             AdvancedQuery += f" -{i}"
+            OutputHTML.write(f"<li>{i}</li>")
+        OutputHTML.write("</ul>")    
+    PriceLow = input("What is the lowest price you would like to filter? $")
+    AdvancedQuery += ("&_udlo=" + PriceLow) if PriceLow != "" else ""
+    OutputHTML.write((f"<li>{PriceLow}</li>") if PriceLow != "" else "")
+    PriceHigh = input("What is the highest price you would like to filter? $")
+    AdvancedQuery += ("&_udhi=" + PriceHigh) if PriceHigh != "" else ""
+    OutputHTML.write((f"<li>{PriceHigh}</li>") if PriceHigh != "" else "")
+    Material = True if input("Is there any material you would like to filter? (Y, N) ").lower() == "y" else False
+    if Material:
+        MatType = input("Which Material? ")
+        AdvancedQuery += ("&Material=" + MatType) if MatType != "" else ""
+        OutputHTML.write((f"<li>Material: {Material}</li>") if MatType != "" else "")
+    if input("Would you like to filter by condition? (Y, N) ").lower() == "y":
+        print("Please enter the associated number for your search: ")
+        for i in range(len(Conditions)):
+            print(f"{i}: {Conditions[i]}")
+        CondCode = int(input("? "))
+        ConditionType = ConditionCodes[CondCode]   
+        OutputHTML.write(f"<li>Condition: {ConditionCodes[CondCode]}</li>")
+    OutputHTML.write("</ul><hr>")
             
     url = "https://www.ebay.com/sch/i.html?_nkw=" + query.replace(" ", "%20") + AdvancedQuery.replace(" ", "%20")
     
@@ -91,6 +102,7 @@ Items = page.split("class=s-item__link href=")
 
 Output.write("Item Name,Item Price,Item Link\n")
 OutputHTML.write("""
+    </head>    
     <body>    
         <table cellpadding="10", cellspacing="5">        
             <tr>            
@@ -143,7 +155,14 @@ for i in range(len(Items)):
 
         print(f"Item: {Name}\n\tLink: {Link}\n\tPrice: {Price}\n")
         Output.write(f"{Name},{Price},{Link}\n")
-        OutputHTML.write(f"<tr><td>{Name}</td><td>{Price}</td><td class='ItemButton'><button onclick='window.open(\"{Link}\")'>Link to Listing</button></td></tr>\n")
+        OutputHTML.write(f"""
+    <tr>
+        <td>{Name}</td>
+        <td>{Price}</td>
+        <td class='ItemButton'>
+            <button onclick='window.open(\"{Link}\")'>Link to Listing</button>
+        </td>
+    </tr>\n""")
 
         #Filter out our bad spans...
         
