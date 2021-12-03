@@ -1,38 +1,35 @@
-import os
-import urllib.request, urllib.parse                                                                             #Import our needed libraries
-import re           
-import webbrowser                                                                                               #We use urllib request, and parse, as well as re for regular expressions
+import os, urllib.request, urllib.parse, re, webbrowser                                                                 #Import all of our useful libraries                                                                                       
 
-def OSFind():
-    from platform import system as sys
-    systemType = sys().lower()
-    
-    if systemType == "darwin":
-        return "MacOS"
-    elif systemType == "linux":
-        return systemType
-    elif systemType == "windows":
-        return systemType
-    else:
-        return "OS Could not be determined!"
+def OSFind():                                                                                                           #This function will be able to identify what OS is this running on
+    from platform import system as sys                                                                                  #Only import one finction from platform, called system, and rename it to sys.
+    systemType = sys().lower()                                                                                          #Get the system type that this is running on.
+    if systemType == "darwin":                                                                                          #MacOS is called Darwin, but that's an easy fix...
+        return "MacOS"                                                                                                      #Return the name as MacOS
+    elif systemType == "linux":                                                                                         #All Linux Distros return the name as Linux, which makes this easy...
+        return "Linux"                                                                                                      #Return the name as Linux
+    elif systemType == "windows":                                                                                       #If we are running on Windows:
+        return "Windows"                                                                                                    #Return the name as Windows
+    else:                                                                                                               #If all these tests fail:
+        return "OS Could not be determined!"                                                                                #This OS could not be determined...
 
-url = ""    
-Output = open("Output.csv", "w")
-OutputHTML = open("Output.html", "w")                                                                                                 #Create a blank string named URL
-AdvancedSearch = True if str.lower(input("Would you like Advanced Search Tools? (Y, N) ")) == "y" else False    #Ask if we are going to use advanced search.
-query = input("What would you like to search for? ")                                                            #Ask for our main search item
-AdvancedQuery = ""
+url = ""                                                                                                                #This will be the variable in which we store our URL for searching
+Output = open("Output.csv", "w", encoding="utf-8")                                                                      #Open a file called Output.csv for writing, and make sure we are using UTF-8 encoding
+OutputHTML = open("Output.html", "w", encoding="utf-8")                                                                 #Open a file, HTML, write, UTF-8. Some listings have emoji, and python doesn't enjoy that sometimes.
+AdvancedSearch = True if str.lower(input("Would you like Advanced Search Tools? (Y, N) ")) == "y" else False            #Ask if we are using Advanced Search Tools
+query = input("What would you like to search for? ")                                                                    #Ask the user what they would like to search for
+AdvancedQuery = ""                                                                                                      #Make a blank string called Advanced Query
 OutputHTML.write("""
 <!DOCTYPE html>
     <html lang="en">
         <head>    
         <meta charset="UTF-8">    
         <meta http-equiv="X-UA-Compatible" content="IE=edge">    
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">    
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">   
+        <link rel="stylesheet" href="style.css" /> 
+        <script src="Sorting.js"></script>
         <title>Ebay Results: </title>
        
-""")
-#Write our HTML boiler plate code to our HTML file.
+""")                                                                                                                    #Write our HTML boiler plate code to our HTML file.
 
 OutputHTML.write(f"<h3>Your Search: {query}</h3>")   
 PriceLow = 0
@@ -86,15 +83,15 @@ if AdvancedSearch:
             print(f"{i}: {Conditions[i]}")
         CondCode = int(input("? "))
         ConditionType = ConditionCodes[CondCode]   
-        OutputHTML.write(f"<li>Condition: {ConditionCodes[CondCode]}</li>")
-    OutputHTML.write("</ul><hr>")
+        OutputHTML.write(f"<li>Condition: {Conditions[CondCode]}</li>")
+    OutputHTML.write("</ul>")
             
     url = "https://www.ebay.com/sch/i.html?_nkw=" + query.replace(" ", "%20") + AdvancedQuery.replace(" ", "%20")
     
 else:
     url = "https://www.ebay.com/sch/i.html?_nkw=" + query.replace(" ", "%20")
 
-
+OutputHTML.write("<hr />")
 print(query)
 print(url)
 page = urllib.request.urlopen(url).read().decode("UTF-8")
@@ -104,10 +101,10 @@ Output.write("Item Name,Item Price,Item Link\n")
 OutputHTML.write("""
     </head>    
     <body>    
-        <table cellpadding="10", cellspacing="5">        
+        <table id="myTable" cellpadding="10", cellspacing="5">        
             <tr>            
-                <th class="Name">Item Name</th>            
-                <th class="Price">Item Price</th>            
+                <th class="Name" onClick="sortTable(0)">Item Name</th>            
+                <th class="Price" onClick="sortTable(1)">Item Price</th>            
                 <th class="Link">Link</th>        
             </tr> """)
 
@@ -167,16 +164,16 @@ for i in range(len(Items)):
         #Filter out our bad spans...
         
         #print(Items[i])
-OutputHTML.write("<style>button{background-color: #002ccb;color: white !important;border-radius: 10px; border: 1px solid black; box-shadow: 3px 3px black; font-family: Arial, Verdana, sans-serif; width: 100; } table{ width: 600px; } th, td{ padding: 7px 10px 10px 10px; } th{ text-transform: uppercase; letter-spacing: 0.1em; font-size: 90%; border-bottom: 2px solid #111111; border-top: 1px solid #999; text-align: left; } .ItemButton{ width: 8vw; } tr:nth-child(2n + 1){ background-color: #efefef; } tr:hover{ background-color: #ffeeee; }</style></body></html>")
+OutputHTML.write("</body></html>")
 Output.close();
 OutputHTML.close();
-OutputOption = input("Would you like to open results in [L]ibreOffice or [B]rowser?")
-if OutputOption.lower() == "b":
-    print(OSFind())
-    if OSFind() == "Linux":
-        os.system("firefox Output.html")
-    elif OSFind() == "Windows":
-        edge = 'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe %s'
-        webbrowser.get(edge).open(f"file://{os.getcwd()}/Output.html")
-    elif OSFind() == "MacOS":
-        webbrowser.get('safari').open(f"file://{os.getcwd()}/Output.html")
+OutputOption = input("Press [Enter] to open in a browser!")
+
+print(f"Current Operating System: {OSFind()}")
+if OSFind() == "Linux":
+    os.system("firefox Output.html")
+elif OSFind() == "Windows":
+    edge = 'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe %s'
+    webbrowser.get(edge).open(f"file://{os.getcwd()}/Output.html")
+elif OSFind() == "MacOS":
+    webbrowser.get('safari').open(f"file://{os.getcwd()}/Output.html")
